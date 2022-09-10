@@ -1,4 +1,4 @@
-# 8, 20.42
+# 9
 # export FLASK_ENV=development
 # export FLASK_APP=hello.py
 
@@ -14,7 +14,10 @@ from datetime import datetime
 # Create a Flask Instance
 app = Flask(__name__)
 # Add Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# Old SQLite DB
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# New mySQL DB
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password123@localhost/our_users'
 # Secret Key!
 app.config['SECRET_KEY'] = "my super secret key that no noe is supposed to know"
 # Initialise The Database
@@ -41,9 +44,6 @@ class UserForm(FlaskForm):
 class NamerForm(FlaskForm):
     name = StringField("What's Your Name", validators=[DataRequired()])
     submit = SubmitField("Submit")
-
-
-
 
 
 
