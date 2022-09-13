@@ -1,4 +1,4 @@
-# 10
+# 11
 # export FLASK_ENV=development
 # export FLASK_APP=hello.py
 
@@ -7,8 +7,10 @@ from flask import Flask, render_template, flash, request
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
 
 
 # Create a Flask Instance
@@ -22,13 +24,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password123@localh
 app.config['SECRET_KEY'] = "my super secret key that no noe is supposed to know"
 # Initialise The Database
 db = SQLAlchemy(app)
-
+migrate = Migrate(app, db)
 
 # Create Model
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
+    favorite_color = db.Column(db.String(120))
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Create A String
@@ -39,6 +42,7 @@ class Users(db.Model):
 class UserForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired()])
+    favorite_color = StringField("Favorite Color")
     submit = SubmitField("Submit")       
 
 # Update Database Record
@@ -49,6 +53,7 @@ def update(id):
     if request.method == "POST":
         name_to_update.name = request.form['name']
         name_to_update.email = request.form['email']
+        name_to_update.favorite_color = request.form['favorite_color']
         try:
             db.session.commit()
             flash("User Updated Successfully!")
@@ -59,16 +64,10 @@ def update(id):
     else:
         return render_template("update.html", form=form, name_to_update=name_to_update)
 
-
-
-
-
 # Create a Form Class
 class NamerForm(FlaskForm):
     name = StringField("What's Your Name", validators=[DataRequired()])
     submit = SubmitField("Submit")
-
-
 
 # def index():
 #     return "<h1>Hello World!</h1>"\\
@@ -89,12 +88,13 @@ def add_user():
     if form.validate_on_submit():
         user = Users.query.filter_by(email=form.email.data).first()
         if user is None:
-            user = Users(name=form.name.data, email=form.email.data)
+            user = Users(name=form.name.data, email=form.email.data, favorite_color=form.favorite_color.data)
             db.session.add(user)
             db.session.commit()
         name = form.name.data
         form.name.data = ''
         form.email.data = ''
+        form.favorite_color.data = ''
         flash("User Added Successfully!")
     our_users = Users.query.order_by(Users.date_added)
     return render_template("add_user.html", form=form, name=name, our_users=our_users)
