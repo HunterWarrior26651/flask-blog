@@ -1,9 +1,9 @@
-# 9
+# 10
 # export FLASK_ENV=development
 # export FLASK_APP=hello.py
 
 from crypt import methods
-from flask import Flask, render_template, flash
+from flask import Flask, render_template, flash, request
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -23,6 +23,7 @@ app.config['SECRET_KEY'] = "my super secret key that no noe is supposed to know"
 # Initialise The Database
 db = SQLAlchemy(app)
 
+
 # Create Model
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -39,6 +40,28 @@ class UserForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired()])
     submit = SubmitField("Submit")       
+
+# Update Database Record
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+def update(id):
+    form = UserForm()
+    name_to_update = Users.query.get_or_404(id)
+    if request.method == "POST":
+        name_to_update.name = request.form['name']
+        name_to_update.email = request.form['email']
+        try:
+            db.session.commit()
+            flash("User Updated Successfully!")
+            return render_template("update.html", form=form, name_to_update=name_to_update)
+        except:
+            flash("Error! There was a problem...try again")
+            return render_template("update.html", form=form, name_to_update=name_to_update)
+    else:
+        return render_template("update.html", form=form, name_to_update=name_to_update)
+
+
+
+
 
 # Create a Form Class
 class NamerForm(FlaskForm):
