@@ -1,4 +1,4 @@
-# 11
+# 12
 # export FLASK_ENV=development
 # export FLASK_APP=hello.py
 
@@ -10,8 +10,6 @@ from wtforms.validators import DataRequired
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-
-
 
 # Create a Flask Instance
 app = Flask(__name__)
@@ -38,6 +36,25 @@ class Users(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.name
 
+
+@app.route('/delete/<int:id>')
+def delete(id):
+    user_to_delete = Users.query.get_or_404(id)
+    name = None
+    form = UserForm()
+
+    try:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        flash("User Deleted Successfully!!")
+
+        our_users = Users.query.order_by(Users.date_added)
+        return render_template("add_user.html", form=form, name=name, our_users=our_users)
+
+    except:
+        flash("Whoops!! There was a problem deleting user...try again")
+        return render_template("add_user.html", form=form, name=name, our_users=our_users)
+
 # Create a Form Class
 class UserForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
@@ -62,7 +79,7 @@ def update(id):
             flash("Error! There was a problem...try again")
             return render_template("update.html", form=form, name_to_update=name_to_update)
     else:
-        return render_template("update.html", form=form, name_to_update=name_to_update)
+        return render_template("update.html", form=form, name_to_update=name_to_update, id = id)
 
 # Create a Form Class
 class NamerForm(FlaskForm):
