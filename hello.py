@@ -1,4 +1,4 @@
-# 17
+# 19
 # export FLASK_ENV=development
 # export FLASK_APP=hello.py
 
@@ -52,7 +52,10 @@ def posts():
 
     return render_template("posts.html", posts=posts) #posts=posts means we can reference posts in posts.html 
 
-
+@app.route('/posts/<int:id>')
+def post(id):
+    post = Posts.query.get_or_404(id)
+    return render_template('post.html', post=post)
 
 # Add Post Page
 @app.route('/add-post', methods=['GET', 'POST'])
