@@ -1,4 +1,4 @@
-# 20
+# 21
 # export FLASK_ENV=development
 # export FLASK_APP=hello.py
 
@@ -44,12 +44,34 @@ class PostForm(FlaskForm):
     slug = StringField("SlugField", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
+@app.route('/posts/delete/<int:id>')
+def delete_post(id):
+    post_to_delete = Posts.query.get_or_404(id)
+
+    try:
+        db.session.delete(post_to_delete)
+        db.session.commit()
+        
+        # Return A Message
+        flash("Blog Post Was Deleted!")
+
+        # Grab all the posts from the database
+        posts = Posts.query.order_by(Posts.date_posted)
+        return render_template("posts.html", posts=posts) 
+
+    except:
+        # Return an error message
+        flash("There was a problem deleting post, try again...")
+
+        # Grab all the posts from the database
+        posts = Posts.query.order_by(Posts.date_posted)
+        return render_template("posts.html", posts=posts) 
+
+
 @app.route('/posts')
 def posts():
     # Grab all the posts from the database
     posts = Posts.query.order_by(Posts.date_posted)
-
-
     return render_template("posts.html", posts=posts) #posts=posts means we can reference posts in posts.html 
 
 @app.route('/posts/<int:id>')
@@ -76,10 +98,6 @@ def edit_post(id):
     form.slug.data = post.slug
     form.content.data = post.content
     return render_template('edit_post.html', form=form)
-
-
-
-
 
 
 # Add Post Page
