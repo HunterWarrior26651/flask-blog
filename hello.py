@@ -2,6 +2,8 @@
 # export FLASK_ENV=development
 # export FLASK_APP=hello.py
 
+# install Git, set up email and username via Git and then setup VSC wth github
+
 from crypt import methods
 from enum import unique
 from flask import Flask, render_template, flash, request, redirect, url_for
@@ -36,9 +38,6 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(user_id):
     return Users.query.get(int(user_id))
-
-
-
 
 # Create Login Page
 @app.route('/login', methods=['GET', 'POST'])
