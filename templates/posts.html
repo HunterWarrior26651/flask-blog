@@ -15,7 +15,7 @@
 {% for post in posts %} <! posts referenced from posts=posts in hello.py ->
 <div class="shadow p-3 mb-5 bg-body rounded">
     <h2><a href="{{ url_for('post', id=post.id) }}">{{ post.title }}</a></h2><br/>
-    <small>By: {{ post.author }}<br/>
+    <small>By: {{ post.poster.name }}<br/> <! poster was created in hello.py file at backref='poster'>
     {{ post.date_posted }}</small>small><br/>
    <br/>
     {{ post.content }}
