@@ -1,4 +1,4 @@
-# 26
+# 29
 # export FLASK_ENV=development
 # export FLASK_APP=hello.py
 
@@ -92,27 +92,37 @@ def dashboard():
 
 
 @app.route('/posts/delete/<int:id>')
+@login_required
 def delete_post(id):
     post_to_delete = Posts.query.get_or_404(id)
+    id = current_user.id 
+    if id == post_to_delete.poster.id:
+        try:
+            db.session.delete(post_to_delete)
+            db.session.commit()
+            
+            # Return A Message
+            flash("Blog Post Was Deleted!")
 
-    try:
-        db.session.delete(post_to_delete)
-        db.session.commit()
-        
+            # Grab all the posts from the database
+            posts = Posts.query.order_by(Posts.date_posted)
+            return render_template("posts.html", posts=posts) 
+
+        except:
+            # Return an error message
+            flash("There was a problem deleting post, try again...")
+
+            # Grab all the posts from the database
+            posts = Posts.query.order_by(Posts.date_posted)
+            return render_template("posts.html", posts=posts) 
+
+    else:
         # Return A Message
-        flash("Blog Post Was Deleted!")
+        flash("You are not authorised to delete that post!")
 
         # Grab all the posts from the database
         posts = Posts.query.order_by(Posts.date_posted)
-        return render_template("posts.html", posts=posts) 
-
-    except:
-        # Return an error message
-        flash("There was a problem deleting post, try again...")
-
-        # Grab all the posts from the database
-        posts = Posts.query.order_by(Posts.date_posted)
-        return render_template("posts.html", posts=posts) 
+        return render_template("posts.html", posts=posts)
 
 
 @app.route('/posts')
@@ -141,12 +151,17 @@ def edit_post(id):
         db.session.commit()
         flash("Post Has Been Updated!")
         return redirect(url_for('post', id=post.id))
-    form.title.data = post.title
-    # form.author.data = post.author
-    form.slug.data = post.slug
-    form.content.data = post.content
-    return render_template('edit_post.html', form=form)
 
+    if current_user.id == post.poster_id:
+        form.title.data = post.title
+        # form.author.data = post.author
+        form.slug.data = post.slug
+        form.content.data = post.content
+        return render_template('edit_post.html', form=form)
+    else:
+        flash("You aren't authorised to edit this post...")
+        posts = Posts.query.order_by(Posts.date_posted)
+        return render_template("posts.html", posts=posts)
 
 # Add Post Page
 @app.route('/add-post', methods=['GET', 'POST'])
