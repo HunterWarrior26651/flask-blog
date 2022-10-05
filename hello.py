@@ -1,4 +1,4 @@
-# 35
+# 37
 # export FLASK_ENV=development
 # export FLASK_APP=hello.py
 
@@ -107,6 +107,7 @@ def dashboard():
         name_to_update.email = request.form['email']
         name_to_update.favorite_color = request.form['favorite_color']
         name_to_update.username = request.form['username']
+        name_to_update.about_author = request.form['about_author']
         try:
             db.session.commit()
             flash("User Updated Successfully!")
@@ -385,6 +386,7 @@ class Users(db.Model, UserMixin):
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
     favorite_color = db.Column(db.String(120))
+    about_author = db.Column(db.Text(500), nullable=True)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     # Do some password stuff!
     password_hash = db.Column(db.String(128))
