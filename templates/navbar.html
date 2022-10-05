@@ -20,6 +20,12 @@
             <a class="nav-link" href="{{ url_for('dashboard') }} ">Dashboard</a> <! logout function defined in hello.py >
           </li>
 
+          {% if current_user.id == 11 %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('admin') }} ">Admin</a> <! logout function defined in hello.py >
+          </li>
+          {% endif %}
+
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('logout') }} ">Logout</a> <! logout function defined in hello.py >
           </li>
