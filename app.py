@@ -20,8 +20,9 @@ app = Flask(__name__)
 # Add Database
 # Old SQLite DB
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://thkrzrqmogwhch:52cb0adb791b1e57af7974baca8ad7e12018333aacca3b311317b6a24cbe8a93@ec2-54-86-106-48.compute-1.amazonaws.com:5432/de0u884ni0l669'
 # New mySQL DB
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password123@localhost/our_users'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password123@localhost/our_users'
 # Secret Key!
 app.config['SECRET_KEY'] = "my super secret key that no one is supposed to know"
 # Initialise The Database
@@ -118,7 +119,6 @@ def dashboard():
     else:
         return render_template("dashboard.html", form=form, name_to_update=name_to_update, id = id)
     return render_template('dashboard.html')
-
 
 
 @app.route('/posts/delete/<int:id>')
@@ -231,9 +231,6 @@ def get_current_date():
     # return {"Date": date.today()}
 
 
-
-
-
 @app.route('/delete/<int:id>')
 def delete(id):
     user_to_delete = Users.query.get_or_404(id)
@@ -251,7 +248,6 @@ def delete(id):
     except:
         flash("Whoops!! There was a problem deleting user...try again")
         return render_template("add_user.html", form=form, name=name, our_users=our_users)
-
 
 
 # Update Database Record
@@ -273,9 +269,6 @@ def update(id):
             return render_template("update.html", form=form, name_to_update=name_to_update)
     else:
         return render_template("update.html", form=form, name_to_update=name_to_update, id = id)
-
-        
-
 
 
 @app.route('/user/add', methods=['GET', 'POST'])
@@ -386,7 +379,7 @@ class Users(db.Model, UserMixin):
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
     favorite_color = db.Column(db.String(120))
-    about_author = db.Column(db.Text(500), nullable=True)
+    about_author = db.Column(db.Text(), nullable=True)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     # Do some password stuff!
     password_hash = db.Column(db.String(128))
